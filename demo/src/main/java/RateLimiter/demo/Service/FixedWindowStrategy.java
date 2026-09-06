@@ -1,16 +1,17 @@
 package RateLimiter.demo.Service;
 
+import RateLimiter.demo.Config.RateLimitProperties;
 import RateLimiter.demo.Model.FixedWindow;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class FixedWindowStrategy implements RateLimitStrategy{
+    @Autowired
+    private RateLimitProperties properties;
     ConcurrentHashMap<String, FixedWindow> hm=new ConcurrentHashMap<>();
-    int interval=2000;//1 window is of 2s (its in millisecons)
-    int initialtoken=5;
-
     @Override
     public boolean isAllowed(String s) {
         long current_time=System.currentTimeMillis();
@@ -30,18 +31,18 @@ public class FixedWindowStrategy implements RateLimitStrategy{
 
     private void fillWindow(FixedWindow window,long time) {
         long diff=(time-window.getLast_window_time());
-        if(diff>=(interval))
+        if(diff>=(properties.getWindowSize()))
         {
             window.setLast_window_time(findStartTime(time));
-            window.setAvailable_tokens(initialtoken);
+            window.setAvailable_tokens(properties.getMaxRequests());
         }
     }
     private long findStartTime(long time)
     {
-        long starting_time=time-(time%interval);
+        long starting_time=time-(time % properties.getWindowSize());
         return starting_time;
     }
     private void setWindow(String s,long time) {
-        hm.putIfAbsent(s,new FixedWindow(initialtoken-1,findStartTime(time)));
+        hm.putIfAbsent(s,new FixedWindow(properties.getMaxRequests(),findStartTime(time)));
     }
 }

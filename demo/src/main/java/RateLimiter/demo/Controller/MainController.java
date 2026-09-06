@@ -10,4 +10,16 @@ public class MainController {
     {
         return "Hello World";
     }
+
+    @GetMapping("/hello/fixed")
+    public String helloFixed()
+    {
+        return "Hello fixed Window";
+    }
+
+    @GetMapping("/hello/sliding")
+    public String helloSliding()
+    {
+        return "Hello Sliding Window";
+    }
 }

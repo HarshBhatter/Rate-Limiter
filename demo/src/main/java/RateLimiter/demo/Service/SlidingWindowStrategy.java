@@ -1,6 +1,8 @@
 package RateLimiter.demo.Service;
 
+import RateLimiter.demo.Config.RateLimitProperties;
 import RateLimiter.demo.Model.SlidingWindow;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayDeque;
@@ -9,8 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class SlidingWindowStrategy implements RateLimitStrategy {
+    @Autowired
+    private RateLimitProperties properties;
     private ConcurrentHashMap<String, Deque<SlidingWindow>> hm=new ConcurrentHashMap<>();
-    private long windowSize=2000;//i.e 2s
     private int allowedRequests=10;
 
     @Override
@@ -31,7 +34,7 @@ public class SlidingWindowStrategy implements RateLimitStrategy {
     }
 
     private void deleteExpired(Deque<SlidingWindow> dq, long currentTime) {
-        while(dq.size()>0 && currentTime-dq.getFirst().getTime()>windowSize)
+        while(dq.size()>0 && currentTime-dq.getFirst().getTime()>properties.getWindowSize())
             dq.removeFirst();
     }
 

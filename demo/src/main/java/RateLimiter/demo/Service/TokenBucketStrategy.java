@@ -10,11 +10,10 @@ public class TokenBucketStrategy implements RateLimitStrategy{
     int capacity=500;
     int rate=5;// i.e 5/s
     @Override
-    public synchronized boolean isAllowed(String s) {
+    public boolean isAllowed(String s) {
         long current_time=System.currentTimeMillis();
 
         setbucket(s, current_time);
-
 
         TokenBucket bucket=hm.get(s);
         synchronized (bucket) {
@@ -28,7 +27,7 @@ public class TokenBucketStrategy implements RateLimitStrategy{
     }
 
     private void setbucket(String s,long time) {
-        hm.putIfAbsent(s,new TokenBucket(rate-1,time));
+        hm.putIfAbsent(s,new TokenBucket(rate,time));
     }
 
     public  void fillbucket(TokenBucket bucket,long time)
